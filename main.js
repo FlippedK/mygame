@@ -30,10 +30,26 @@ let bot = {
     color: 'red'
 }
 
-bots.push(bot);
+// bots.push(spawnCube(map, bot));
+
+let buffs = [];
+
+let buff = {
+    x: 0,
+    y: 0,
+    id: 1,
+    width: 56,
+    height: 56,
+    trn: .25,
+    step: 56,
+    color: 'yellow'
+};
+
+// buffs.push(spawnCube(map, buff));
 
 renderMap(map);
 renderCube(spawnCube(map, cube));
-renderBots(bots);
+// renderBots(bots);
+// renderBuffs(buffs);
 
-console.log(window);
+let tike = setInterval(timeTike, 1000);
