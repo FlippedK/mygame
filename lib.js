@@ -2,6 +2,9 @@ document.onkeydown = checkButton;
 
 function checkButton(event) {
 
+    cube.oldX = cube.x;
+    cube.oldY = cube.y;
+
     let cubeRight = cube.x + cube.width;
     let cubeBottom = cube.y + cube.height;
 
@@ -63,6 +66,8 @@ function checkButton(event) {
     }
 
     renderCube(cube);
+
+    initShot();
 }
 
 function renderCube(cube) {
@@ -90,18 +95,27 @@ function spawnCube(map, cube) {
     let mapMinY = map.y;
     let mapMaxY = map.y + map.height - cube.height;
 
-    cube.x = Math.round(mapMinX + Math.random() * (mapMaxX - mapMinX));
-    cube.y = Math.round(mapMinY + Math.random() * (mapMaxY - mapMinY));
+    cube.x = Math.round(
+        mapMinX +
+        Math.random() * (mapMaxX - mapMinX)
+        );
 
+    cube.y = Math.round(
+        mapMinY +
+        Math.random() * (mapMaxY - mapMinY)
+        );
     return cube;
 }
 
 function renderBots(bots) {
     bots.map(bot => {
-        let div = document.createElement('div');
-        div.id = 'bot_' +  bot.id;
-        div.className = 'bot';
-        document.body.append(div);
+        if (!document.getElementById('bot_' + bot.id)) {
+            let div = document.createElement('div');
+            div.id = 'bot_' + bot.id;
+            div.className = 'bot';
+            document.body.append(div);
+        }
+
         renderBot(bot);
     });
 }
@@ -115,13 +129,15 @@ function renderBot(bot) {
     document.getElementById('bot_' + bot.id).style.backgroundColor = bot.color;
 }
 
-
 function renderBuffs(buffs) {
     buffs.map(buff => {
-        let div = document.createElement('div');
-        div.id = 'buff_' +  buff.id;
-        div.className = 'buff';
-        document.body.append(div);
+        if (!document.getElementById('buff_' + buff.id)) {
+            let div = document.createElement('div');
+            div.id = 'buff_' + buff.id;
+            div.className = 'buff';
+            document.body.append(div);
+        }
+
         renderBuff(buff);
     });
 }
@@ -135,10 +151,10 @@ function renderBuff(buff) {
     document.getElementById('buff_' + buff.id).style.backgroundColor = buff.color;
 }
 
-function timeTike(bots, ) {
+function timeTike() {
     // console.log(new Date().getSeconds());
     buffsLogic();
-    botsLogic();
+    // botsLogic();
 }
 
 function buffsLogic() {
@@ -149,4 +165,44 @@ function buffsLogic() {
 function botsLogic() {
     bots.push(spawnCube(map, bot));
     renderBots(bots);
+}
+
+
+function initShot() {
+
+    let cubeBottom = cube.y + cube.height;
+    let cubeRight = cube.x + cube.width;
+
+    buffs.map((buff, index) => {
+
+        let buffBottom = buff.y + buff.height;
+        let buffRight = buff.x + buff.width;
+
+        if ((buff.y > cube.oldY && buff.y < cube.y) ||
+        (buff.y > cube.y && buff.y < cube.oldY)) {
+            if ((cube.x < buffRight && cube.x > buff.x) || 
+            (cubeRight < buffRight && cubeRight > buff.x)) {
+                shotBuff(buff);
+                buffs.splice(index, 1);
+                
+                console.log(buffs);
+            }
+        }
+        if ((buff.x > cube.oldX && buff.x < cube.x) || 
+        (buff.x > cube.x && buff.x < cube.oldX)) {
+
+            if ((cube.y < buffBottom && cube.y > buff.y) || 
+            (cubeBottom < buffBottom && cubeBottom > buff.y)) {
+                shotBuff(buff);
+                buffs.splice(index, 1);
+
+                console.log(buffs);
+            }
+        }
+    });
+}
+
+function shotBuff(buff) {
+    console.log('shotBuff');
+    document.getElementById('buff_' + buff.id).remove();
 }
